@@ -1,8 +1,10 @@
 ﻿declare module CANNON {
 
     export interface IAABBOptions {
+
         upperBound?: Vec3;
         lowerBound?: Vec3;
+
     }
 
     export class AABB {
@@ -12,14 +14,16 @@
 
         constructor(options?: IAABBOptions);
 
-        copy(aabb: AABB): void;
         setFromPoints(points: Vec3[], position?: Vec3, quaternion?: Quaternion, skinSize?: number): void;
+        copy(aabb: AABB): void;
         extend(aabb: AABB): void;
         overlaps(aabb: AABB): boolean;
 
     }
 
     export class ArrayCollisionMatrix {
+
+        matrix: Mat3[];
 
         get(i: number, j: number): number;
         set(i: number, j: number, value?: number): void;
@@ -34,31 +38,37 @@
         useBoundingBoxes: boolean;
         dirty: boolean;
 
-        collisionPairs(world: World, pairs1: any[], pairs2: any[]): void;
+        collisionPairs(world: World, p1: Body[], p2: Body[]): void;
         needBroadphaseCollision(bodyA: Body, bodyB: Body): boolean;
-        intersectionTest(bodyA: Body, bodyB: Body, pairs1: any[], pairs3: any[]): void;
-        doBoundingSphereBroadphase(bodyA: Body, bodyB: Body, pairs1: any[], pairs2: any[]): void;
-        doBoundingBoxBroadphase(bodyA: Body, bodyB: Body, pairs1: any[], pairs2: any[]): void;
-        makePairsUnique(pairs1: any[], pairs2: any[]): void;
-        setWorld(world: World);
+        intersectionTest(bodyA: Body, bodyB: Body, pairs1: Body[], pairs2: Body[]): void;
+        doBoundingSphereBroadphase(bodyA: Body, bodyB: Body, pairs1: Body[], pairs2: Body[]): void;
+        doBoundingBoxBroadphase(bodyA: Body, bodyB: Body, pairs1: Body[], pairs2: Body[]): void;
+        makePairsUnique(pairs1: Body[], pairs2: Body[]): void;
+        setWorld(world: World): void;
         boundingSphereCheck(bodyA: Body, bodyB: Body): boolean;
-        aabbQuery(world: World, aabb: AABB, result?: any[]): Body[];
+        aabbQuery(world: World, aabb: AABB, result: Body[]): Body[];
 
     }
 
     export class GridBroadphase extends BroadPhase {
 
-        constructor(aabbMin: Vec3, aabbMax: Vec3, nx?: number, ny?: number, nz?: number);
+        nx: number;
+        ny: number;
+        nz: number;
+        aabbMin: Vec3;
+        aabbMax: Vec3;
+        bins: any[];
+
+        constructor(aabbMin?: Vec3, aabbMax?: Vec3, nx?: number, ny?: number, nz?: number);
 
     }
 
     export class NaiveBroadphase extends BroadPhase {
-
     }
 
     export class ObjectCollisionMatrix {
 
-        matrix: any[];
+        matrix: number[];
 
         get(i: number, j: number): number;
         set(i: number, j: number, value: number): void;
@@ -76,8 +86,7 @@
 
         constructor(from?: Vec3, to?: Vec3);
 
-        intersectBody(body: Body, result: RaycastResult, direction: Vec3): RaycastResult;
-        intersectBodies(bodies: Body[], result: RaycastResult): void;
+        getAABB(result: RaycastResult): void;
 
     }
 
@@ -109,6 +118,9 @@
         axisIndex: number;
 
         constructor(world?: World);
+
+        autoDetectAxis(): void;
+        aabbQuery(world: World, aabb: AABB, result?: Body[]): Body[];
 
     }
 
@@ -193,7 +205,7 @@
         computeGWlamda(): number;
         computeGiMf(): number;
         computeGiMGt(): number;
-        addToWlamda(): number;
+        addToWlamda(deltalambda: number): number;
         computeC(): number;
 
     }
@@ -206,11 +218,26 @@
 
     export class RotationalEquation extends Equation {
 
+        ni: Vec3;
+        nj: Vec3;
+        nixnj: Vec3;
+        njxni: Vec3;
+        invIi: Mat3;
+        invIj: Mat3;
+        relVel: Vec3;
+        relForce: Vec3;
+
         constructor(bodyA: Body, bodyB: Body);
 
     }
 
     export class RotationalMotorEquation extends Equation {
+
+        axisA: Vec3;
+        axisB: Vec3;
+        invLi: Mat3;
+        invIj: Mat3;
+        targetVelocity: number;
 
         constructor(bodyA: Body, bodyB: Body, maxForce?: number);
 
@@ -225,10 +252,12 @@
         ni: Vec3;
         rixn: Vec3;
         rjxn: Vec3;
-        invIi: Vec3;
-        invIj: Vec3;
+        invIi: Mat3;
+        invIj: Mat3;
+        biInvInertiaTimesRixn: Vec3;
+        bjInvInertiaTimesRjxn: Vec3;
 
-        constructor(bodyA: Body, bodyB: Body);
+        constructor(bi: Body, bj: Body);
 
     }
 
@@ -273,13 +302,13 @@
         rotational: Vec3;
 
         multiplyElement(element: JacobianElement): number;
-        multiplyVecors(spacial: Vec3, rotational: Vec3): number;
+        multiplyVectors(spacial: Vec3, rotational: Vec3): number;
 
     }
 
     export class Mat3 {
 
-        constructor(elements: number[]);
+        constructor(elements?: number[]);
 
         identity(): void;
         setZero(): void;
@@ -399,6 +428,8 @@
         static AWAKE: number;
         static SLEEPY: number;
         static SLEEPING: number;
+        static sleepyEvent: IEvent;
+        static sleepEvent: IEvent;
 
         id: number;
         world: World;
@@ -450,8 +481,6 @@
 
         wakeUp(): void;
         sleep(): void;
-        sleepyEvent: { type: string };
-        sleepEvent: { type: string };
         sleepTick(time: number): void;
         updateSolveMassProperties(): void;
         pointToLocalFrame(worldPoint: Vec3, result?: Vec3): Vec3;
@@ -589,7 +618,6 @@
 
     export class RigidVehicle {
 
-
         wheelBodies: Body[];
         coordinateSystem: Vec3;
         chasisBody: Body;
@@ -613,7 +641,7 @@
 
     export class SPHSystem {
 
-        particles: Body[];
+        particles: Particle[];
         density: number;
         smoothingRadius: number;
         speedOfSound; number;
@@ -623,9 +651,9 @@
         densities: number[];
         neighbors: number[];
 
-        add(particle: Body): void;
-        remove(particle: Body): void;
-        getNeighbors(particle: Body, neighbors: Body[]): void;
+        add(particle: Particle): void;
+        remove(particle: Particle): void;
+        getNeighbors(particle: Particle, neighbors: Particle[]): void;
         update(): void;
         w(r: number): number;
         gradw(rVec: Vec3, resultVec: Vec3): void;
@@ -667,7 +695,10 @@
 
     export class Box extends Shape {
 
-        type: number;
+        static calculateIntertia(halfExtents: Vec3, mass: number, target: Vec3): void;
+
+        boundingSphereRadius: number;
+        collisionResponse: boolean;
         halfExtents: Vec3;
         convexPolyhedronRepresentation: ConvexPolyhedron;
 
@@ -675,10 +706,9 @@
 
         updateConvexPolyhedronRepresentation(): void;
         calculateLocalInertia(mass: number, target?: Vec3): Vec3;
-        calculateIntertia(halfExtents: Vec3, mass: number, target: Vec3): void;
         getSideNormals(sixTargetVectors: boolean, quat?: Quaternion): Vec3[];
+        updateBoundingSphereRadius(): number;
         volume(): number;
-        updateBoundingSphereRadius(): void;
         forEachWorldCorner(pos: Vec3, quat: Quaternion, callback: Function): void;
 
     }
@@ -688,9 +718,9 @@
         static computeNormal(va: Vec3, vb: Vec3, vc: Vec3, target: Vec3): void;
         static project(hull: ConvexPolyhedron, axis: Vec3, pos: Vec3, quat: Quaternion, result: number[]): void;
 
-        type: number;
-
         vertices: Vec3[];
+        worldVertices: Vec3[];
+        worldVerticesNeedsUpdate: boolean;
         faces: number[];
         faceNormals: Vec3[];
         uniqueEdges: Vec3[];
@@ -703,16 +733,13 @@
         clipAgainstHull(posA: Vec3, quatA: Quaternion, hullB: Vec3, quatB: Quaternion, separatingNormal: Vec3, minDist: number, maxDist: number, result: any[]): void;
         findSaparatingAxis(hullB: ConvexPolyhedron, posA: Vec3, quatA: Quaternion, posB: Vec3, quatB: Quaternion, target: Vec3, faceListA: any[], faceListB: any[]): boolean;
         testSepAxis(axis: Vec3, hullB: ConvexPolyhedron, posA: Vec3, quatA: Quaternion, posB: Vec3, quatB: Quaternion): number;
-        calculateLocalInertia(mass: number, target: Vec3): void;
         getPlaneConstantOfFace(face_i: number): number;
         clipFaceAgainstHull(separatingNormal: Vec3, posA: Vec3, quatA: Quaternion, worldVertsB1: Vec3[], minDist: number, maxDist: number, result: any[]): void;
         clipFaceAgainstPlane(inVertices: Vec3[], outVertices: Vec3[], planeNormal: Vec3, planeConstant: number): Vec3;
         computeWorldVertices(position: Vec3, quat: Quaternion): void;
         computeLocalAABB(aabbmin: Vec3, aabbmax: Vec3): void;
         computeWorldFaceNormals(quat: Quaternion): void;
-        updateBoundingSphereRadius(): void;
         calculateWorldAABB(pos: Vec3, quat: Quaternion, min: Vec3, max: Vec3): void;
-        volume(): number;
         getAveragePointLocal(target: Vec3): Vec3;
         transformAllPoints(offset: Vec3, quat: Quaternion): void;
         pointIsInside(p: Vec3): boolean;
@@ -753,30 +780,21 @@
         getRectMinMax(iMinX: number, iMinY: number, iMaxX: number, iMaxY: number, result: any[]): void;
         getIndexOfPosition(x: number, y: number, result: any[], clamp: boolean): boolean;
         getConvexTrianglePillar(xi: number, yi: number, getUpperTriangle: boolean): void;
-        volume(): number;
+
     }
 
     export class Particle extends Shape {
-
-        type: number;
-
-        calculateLocalInertia(mass: number, target: Vec3): Vec3;
-        volume(): number;
 
     }
 
     export class Plane extends Shape {
 
-        type; number;
         worldNormal: Vec3;
         worldNormalNeedsUpdate: boolean;
         boundingSphereRadius: number;
 
         computeWorldNormal(quat: Quaternion): void;
-        calculateLocalInteria(mass: number, target?: Vec3): Vec3;
-        volume(): number;
         calculateWorldAABB(pos: Vec3, quat: Quaternion, min: number, max: number): void;
-        updateBoundingSphereRadius(): number;
 
     }
 
@@ -808,14 +826,8 @@
     export class Sphere extends Shape {
 
         radius: number;
-        type: number;
 
         constructor(radius: number);
-
-        calculateLocalInertia(mass: number, target?: Vec3): Vec3;
-        volume(): number;
-        updateBoundingSphereRadius(): number;
-        calculateWorldAABB(pos: Vec3, quat: Quaternion, min: number, max: number): void;
 
     }
 
@@ -855,7 +867,7 @@
         addEventListener(type: string, listener: Function): EventTarget;
         hasEventListener(type: string, listener: Function): boolean;
         removeEventListener(type: string, listener: Function): EventTarget;
-        dispatchEvent(event: any): any;
+        dispatchEvent(event: IEvent): IEvent;
 
     }
 
@@ -897,6 +909,9 @@
     }
 
     export class NarrowPhase {
+
+        contactPointPool: Pool[];
+        v3pool: Vec3Pool;
 
     }
 
@@ -962,6 +977,5 @@
         body: Body;
 
     }
-
 
 }
