@@ -930,7 +930,7 @@
         gravity: Vec3;
         broadphase: NaiveBroadphase;
         bodies: Body[];
-        solver: GSSolver;
+        solver: Solver;
         constraints: Constraint[];
         narrowPhase: NarrowPhase;
         collisionMatrix: ArrayCollisionMatrix;
