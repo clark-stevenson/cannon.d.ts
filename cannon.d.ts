@@ -465,7 +465,7 @@
         shapes: Shape[];
         shapeOffsets: any[];
         shapeOrentiations: any[];
-        intertia: Vec3;
+        inertia: Vec3;
         invInertia: Vec3;
         invInertiaWorld: Mat3;
         invMassSolve: number;
@@ -489,7 +489,7 @@
         addShape(shape: Shape, offset?: Vec3, orientation?: Vec3): void;
         updateBoundingRadius(): void;
         computeAABB(): void;
-        updateIntertiaWorld(force: Vec3): void;
+        updateInertiaWorld(force: Vec3): void;
         applyForce(force: Vec3, worldPoint: Vec3): void;
         applyImpulse(impulse: Vec3, worldPoint: Vec3): void;
         updateMassProperties(): void;
