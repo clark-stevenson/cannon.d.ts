@@ -198,7 +198,7 @@
 
         constructor(bi: Body, bj: Body, minForce?: number, maxForce?: number);
 
-        setSpookParams(stiffness: number, relaxation: number, timeStep: number);
+        setSpookParams(stiffness: number, relaxation: number, timeStep: number): void;
         computeB(a: number, b: number, h: number): number;
         computeGq(): number;
         computeGW(): number;
@@ -499,7 +499,7 @@
 
     export interface IRaycastVehicleOptions {
 
-        chasisBody?: Body;
+        chassisBody?: Body;
         indexRightAxis?: number;
         indexLeftAxis?: number;
         indexUpAxis?: number;
@@ -597,7 +597,7 @@
 
         constructor(options?: IRaycastVehicleOptions);
 
-        addWheel(options?: IWheelInfoOptions);
+        addWheel(options?: IWheelInfoOptions): void;
         setSteeringValue(value: number, wheelIndex: number): void;
         applyEngineForce(value: number, wheelIndex: number): void;
         setBrake(brake: number, wheelIndex: number): void;
@@ -612,7 +612,7 @@
 
     export interface IRigidVehicleOptions {
 
-        chasisBody: Body;
+        chassisBody: Body;
 
     }
 
@@ -620,7 +620,7 @@
 
         wheelBodies: Body[];
         coordinateSystem: Vec3;
-        chasisBody: Body;
+        chassisBody: Body;
         constraints: Constraint[];
         wheelAxes: Vec3[];
         wheelForces: Vec3[];
@@ -644,7 +644,7 @@
         particles: Particle[];
         density: number;
         smoothingRadius: number;
-        speedOfSound; number;
+        speedOfSound: number;
         viscosity: number;
         eps: number;
         pressures: number[];
