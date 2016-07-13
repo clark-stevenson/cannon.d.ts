@@ -554,7 +554,7 @@
         collisionFilterGroup?: number;
         collisionFilterMask?: number;
         fixedRotation?: boolean;
-        shape?: Body;
+        shape?: Shape;
 
     }
 
