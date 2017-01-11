@@ -580,6 +580,7 @@
         position: Vec3;
         previousPosition: Vec3;
         initPosition: Vec3;
+        boundingRadius: number;
         velocity: Vec3;
         initVelocity: Vec3;
         force: Vec3;
