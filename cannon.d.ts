@@ -603,7 +603,7 @@
         interpolatedQuaternion: Quaternion;
         shapes: Shape[];
         shapeOffsets: any[];
-        shapeOrentiations: any[];
+        shapeOrientations: any[];
         inertia: Vec3;
         invInertia: Vec3;
         invInertiaWorld: Mat3;
