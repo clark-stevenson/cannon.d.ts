@@ -373,14 +373,21 @@
 
     }
 
+    export interface IMaterialOptions {
+
+        friction?: number;
+        restitution?: number;
+
+    }
+
     export class Material {
 
-        id: number;
         name: string;
-        friction: number;
-        restitution: number;
+        id: number;
+        friction:number;
+        restitution:number;
 
-        constructor(name?: string);
+        constructor(options?: string|IMaterialOptions);
 
     }
 
